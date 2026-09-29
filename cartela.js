@@ -1,65 +1,48 @@
-import { db, ref, onValue } from "./firebase.js";
+import { db } from "./firebase.js";
+import { ref, onValue } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
 import { CONFIG } from "./config.js";
 
 const grid = document.getElementById("grid");
 const titulo = document.getElementById("titulo");
 const sel = document.getElementById("sel");
 const total = document.getElementById("total");
+const mensagem = document.getElementById("mensagemDisponibilidade");
 
 let cartela = 0;
 let selecionados = [];
 let status = {};
 
-const TOTAL_CARTELAS = 10;
-const POR_CARTELA = 100;
-const MAX = CONFIG.reserva.maxNumerosPorParticipacao;
-
-function formatar(n) {
+function formatarNumero(n) {
     return String(n).padStart(3, "0");
 }
 
-function numeroDisponivel(item) {
+function estaDisponivel(numero) {
+    const item = status[numero];
     if (!item) return true;
-
     if (item.status === "disponivel") return true;
-
-    if (
-        item.status === "reservado" &&
-        Number(item.expiraEm || 0) <= Date.now()
-    ) {
-        return true;
-    }
-
+    if (item.status === "reservado" && Number(item.expiraEm || 0) <= Date.now()) return true;
     return false;
 }
 
 function render() {
-    titulo.textContent =
-        `CARTELA ${String(cartela + 1).padStart(2, "0")}`;
-
+    titulo.textContent = `CARTELA ${String(cartela + 1).padStart(2, "0")}`;
     grid.innerHTML = "";
 
-    const inicio = cartela * POR_CARTELA;
+    const inicio = cartela * 100;
 
-    for (let i = 0; i < POR_CARTELA; i++) {
-        const n = inicio + i;
-        const key = formatar(n);
+    for (let i = 0; i < 100; i++) {
+        const key = formatarNumero(inicio + i);
         const item = status[key];
-
+        const disponivel = estaDisponivel(key);
         const b = document.createElement("button");
+
         b.type = "button";
         b.textContent = key;
-
-        const disponivel = numeroDisponivel(item);
-
-        b.style.cssText =
-            "padding:12px 4px;border-radius:12px;border:1px solid #58b833;" +
-            "background:#07340c;color:#fff;font-weight:800";
+        b.style.cssText = "padding:12px 4px;border-radius:12px;border:1px solid #58b833;background:#07340c;color:#fff;font-weight:800";
 
         if (!disponivel) {
             b.disabled = true;
-            b.style.background =
-                item?.status === "vendido" ? "#591010" : "#5a4108";
+            b.style.background = item?.status === "vendido" ? "#591010" : "#5a4108";
         }
 
         if (selecionados.includes(key)) {
@@ -68,18 +51,14 @@ function render() {
         }
 
         b.onclick = () => {
-            if (!disponivel) return;
+            if (!estaDisponivel(key)) return;
 
             if (selecionados.includes(key)) {
-                selecionados =
-                    selecionados.filter(x => x !== key);
-            } else {
-                if (selecionados.length >= MAX) {
-                    alert(`Você pode selecionar no máximo ${MAX} números.`);
-                    return;
-                }
-
+                selecionados = selecionados.filter(x => x !== key);
+            } else if (selecionados.length < 10) {
                 selecionados.push(key);
+            } else {
+                alert("Você pode escolher no máximo 10 números por participação.");
             }
 
             update();
@@ -90,43 +69,30 @@ function render() {
 }
 
 function update() {
-    const ordenados =
-        [...selecionados].sort((a, b) => Number(a) - Number(b));
-
-    sel.textContent =
-        ordenados.length ? ordenados.join(", ") : "Nenhum";
-
-    total.textContent =
-        `R$ ${(ordenados.length * CONFIG.valor)
-            .toFixed(2)
-            .replace(".", ",")}`;
-
+    sel.textContent = selecionados.join(", ") || "Nenhum";
+    total.textContent = `R$ ${(selecionados.length * CONFIG.valor).toFixed(2).replace(".", ",")}`;
     render();
 }
 
 function ir(n) {
     n = Number(n);
-
     if (!Number.isInteger(n) || n < 0 || n > 999) {
-        alert("Informe um número entre 000 e 999.");
+        alert("Digite um número entre 000 e 999.");
         return;
     }
 
-    cartela = Math.floor(n / POR_CARTELA);
+    cartela = Math.floor(n / 100);
     render();
-
-    document
-        .getElementById("grid")
-        .scrollIntoView({ behavior: "smooth" });
+    document.getElementById("grid").scrollIntoView({ behavior: "smooth" });
 }
 
 document.getElementById("prev").onclick = () => {
-    cartela = (cartela + TOTAL_CARTELAS - 1) % TOTAL_CARTELAS;
+    cartela = (cartela + 9) % 10;
     render();
 };
 
 document.getElementById("next").onclick = () => {
-    cartela = (cartela + 1) % TOTAL_CARTELAS;
+    cartela = (cartela + 1) % 10;
     render();
 };
 
@@ -137,30 +103,22 @@ document.getElementById("ir").onclick = () => {
 document.getElementById("sugerir").onclick = () => {
     const disponiveis = [];
 
-    for (let n = 0; n < 1000; n++) {
-        const key = formatar(n);
-
-        if (
-            numeroDisponivel(status[key]) &&
-            !selecionados.includes(key)
-        ) {
-            disponiveis.push(n);
+    for (let i = 0; i < 1000; i++) {
+        const key = formatarNumero(i);
+        if (estaDisponivel(key) && !selecionados.includes(key)) {
+            disponiveis.push(key);
         }
     }
 
     if (!disponiveis.length) {
-        alert("Não há números disponíveis no momento.");
+        alert("No momento não encontramos números disponíveis.");
         return;
     }
 
-    const n =
-        disponiveis[Math.floor(Math.random() * disponiveis.length)];
+    const key = disponiveis[Math.floor(Math.random() * disponiveis.length)];
+    ir(Number(key));
 
-    ir(n);
-
-    const key = formatar(n);
-
-    if (selecionados.length < MAX) {
+    if (selecionados.length < 10) {
         selecionados.push(key);
         update();
     }
@@ -172,61 +130,41 @@ document.getElementById("continuar").onclick = () => {
         return;
     }
 
-    const numeros =
-        [...new Set(selecionados)].sort(
-            (a, b) => Number(a) - Number(b)
-        );
-
-    sessionStorage.setItem(
-        "rifaSelecionados",
-        JSON.stringify(numeros)
-    );
-
+    localStorage.setItem("rifaSelecionados", JSON.stringify(selecionados));
     location.href = "reserva.html";
 };
 
-onValue(
-    ref(db, "rifa/numeros"),
-    snapshot => {
-        status = snapshot.val() || {};
-        render();
-    },
-    error => {
-        console.error(error);
-        alert("Não foi possível carregar os números agora.");
+onValue(ref(db, "rifa/numeros"), snapshot => {
+    status = snapshot.val() || {};
+    const totalDisponiveis = Object.keys(status).filter(estaDisponivel).length;
+    if (mensagem) {
+        mensagem.textContent = `${totalDisponiveis} números disponíveis no momento.`;
     }
-);
+    render();
+}, error => {
+    console.error("Erro ao carregar números:", error);
+    if (mensagem) {
+        mensagem.textContent = "Não foi possível atualizar os números agora. Tente novamente.";
+    }
+    render();
+});
 
 const params = new URLSearchParams(location.search);
-
 if (params.has("numero")) {
     ir(params.get("numero"));
 } else {
     render();
 }
 
-let startX = 0;
+let start = 0;
+grid.addEventListener("touchstart", e => {
+    start = e.touches[0].clientX;
+}, { passive: true });
 
-grid.addEventListener(
-    "touchstart",
-    e => {
-        startX = e.touches[0].clientX;
-    },
-    { passive: true }
-);
-
-grid.addEventListener(
-    "touchend",
-    e => {
-        const endX = e.changedTouches[0].clientX;
-
-        if (Math.abs(endX - startX) > 60) {
-            cartela =
-                endX < startX
-                    ? Math.min(TOTAL_CARTELAS - 1, cartela + 1)
-                    : Math.max(0, cartela - 1);
-
-            render();
-        }
+grid.addEventListener("touchend", e => {
+    const end = e.changedTouches[0].clientX;
+    if (Math.abs(end - start) > 60) {
+        cartela = end < start ? Math.min(9, cartela + 1) : Math.max(0, cartela - 1);
+        render();
     }
-);
+});

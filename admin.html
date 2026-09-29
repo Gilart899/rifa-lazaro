@@ -1,22 +1,55 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <meta
-        name="theme-color"
-        content="#031603"
-    >
-
-    <title>🔐 Admin | Rifa Solidária</title>
-
-    <link
-        rel="icon"
-        href="img/178463
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#031603">
+<title>🔐 Admin | Rifa Solidária</title>
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<div class="background-clovers"><div class="trevo t1">🍀</div><div class="trevo t2">🍀</div><div class="trevo t3">🍀</div><div class="trevo t4">🍀</div><div class="trevo t5">🍀</div></div>
+<section id="login" class="glass" style="max-width:460px;margin:60px auto;text-align:center;">
+  <h1>🔐 Acesso administrativo</h1>
+  <p>Entre para administrar a rifa.</p>
+  <input id="email" type="email" placeholder="E-mail">
+  <input id="senha" type="password" placeholder="Senha">
+  <button id="btnEntrar" class="btn btn-primary">ENTRAR</button>
+  <p id="loginErro"></p>
+</section>
+<section id="painel" hidden>
+<header class="top-header glass">
+  <a class="btn-voltar" href="index.html">← Voltar</a>
+  <div class="title-box"><h1>🔐 Painel da Rifa</h1><p>GilFest • Administração</p></div>
+  <button id="btnSair" class="btn btn-danger">SAIR</button>
+</header>
+<main class="admin-main">
+<section class="glass dashboard">
+  <h2>📊 Resumo</h2>
+  <div class="cards-dashboard">
+    <div class="card-admin"><span>Disponíveis</span><strong id="totalDisponiveis">0</strong></div>
+    <div class="card-admin"><span>Reservados</span><strong id="totalReservados">0</strong></div>
+    <div class="card-admin"><span>Vendidos</span><strong id="totalVendidos">0</strong></div>
+    <div class="card-admin destaque"><span>Arrecadado</span><strong id="valorArrecadado">R$ 0,00</strong></div>
+  </div>
+</section>
+<section class="glass">
+  <h2>📅 Data do sorteio</h2>
+  <p>Você poderá alterar a data e o horário do sorteio quando decidir uma nova data da Loteria Federal.</p>
+  <div class="config-grid">
+    <div class="campo"><label for="dataSorteioAdmin">Nova data e horário</label><input id="dataSorteioAdmin" type="datetime-local"></div>
+  </div>
+  <div class="acoes-config"><button id="btnSalvarSorteio" class="btn btn-success">💾 SALVAR DATA DO SORTEIO</button></div>
+  <p id="statusSorteio"></p>
+</section>
+<section class="glass">
+  <h2>🔎 Números</h2>
+  <div class="pesquisa-grid"><input id="buscarAdmin" inputmode="numeric" maxlength="3" placeholder="Pesquisar número 000–999"><button id="btnExportar" class="btn btn-primary">EXPORTAR BACKUP</button></div>
+  <p id="contadorTabela">0 registros</p>
+  <div class="tabela-responsiva"><table class="tabela-admin"><thead><tr><th>Número</th><th>Cliente</th><th>WhatsApp</th><th>Status</th><th>Pagamento</th><th>Raspadinha</th><th>Ação</th></tr></thead><tbody id="listaNumeros"></tbody></table></div>
+</section>
+</main>
+</section>
+<script type="module" src="admin.js"></script>
+</body>
+</html>

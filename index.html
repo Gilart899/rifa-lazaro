@@ -1,1 +1,87 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#031b05"><link rel="stylesheet" href="style.css"><title>🎟️ Rifa Entre Amigos | GilFest</title></head><body><div class="bg">🍀</div><header><img src="img/1784636629590.png" onerror="this.style.display='none'" alt="GilFest"><span class="online">● ONLINE</span></header><main><section class="hero"><div class="clover">🍀</div><h1>RIFA ENTRE AMIGOS</h1><h2>💚 Em prol da realização dos exames de Dona Bené</h2><div class="people"><div><img src="img/1783887880857.png" onerror="this.style.display='none'" alt="Dona Bené"><b>Dona Bené</b></div><div><img src="img/mae.png" onerror="this.style.display='none'" alt="Foto de apoio"></div></div><p>Sua ajuda faz toda diferença.<br>Cada número vendido aproxima a realização dos exames.</p></section><section class="card glass"><h2>🎟️ Escolha sua sorte</h2><p>Selecione seus números de 000 a 999.</p><a class="btn" href="cartela.html">ESCOLHER NÚMEROS →</a></section><section class="glass"><h2>🎁 Prêmio</h2><h3>Geladeira Midea Frost Free</h3><strong class="price">R$ 10,00 por número</strong><p>Sorteio: 30/12/2026 • 20:00</p></section><section class="glass"><h2>🔍 Encontrar número</h2><input id="busca" inputmode="numeric" maxlength="3" placeholder="Ex.: 750"><button class="btn" onclick="irNumero()">IR PARA O NÚMERO</button></section></main><footer>🔒 Rifa Solidária • <b>GilFest</b></footer><script>function irNumero(){let n=(document.getElementById('busca').value||'').replace(/\D/g,'');if(n!==''&&+n>=0&&+n<=999)location.href='cartela.html?numero='+String(+n).padStart(3,'0')}</
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#031b05">
+<link rel="stylesheet" href="style.css">
+<title>🎟️ Rifa Entre Amigos | GilFest</title>
+</head>
+<body>
+<div class="bg">🍀</div>
+<header>
+  <img src="img/1784636629590.png" onerror="this.style.display='none'" alt="GilFest">
+  <span class="online">● ONLINE</span>
+</header>
+<main>
+  <section class="hero">
+    <div class="clover">🍀</div>
+    <h1>RIFA ENTRE AMIGOS</h1>
+    <h2>💚 Rifa Entre Amigos</h2>
+    <div class="people">
+      <div><img src="img/1783887880857.png" onerror="this.style.display='none'" alt="Dona Bené"><b>Dona Bené</b></div>
+      <div><img src="img/mae.png" onerror="this.style.display='none'" alt="Foto de apoio"></div>
+    </div>
+    <p><strong>Sua ajuda faz toda diferença.</strong><br>Cada número vendido representa um gesto de solidariedade e esperança. 💚</p>
+  </section>
+
+  <section class="glass como-participar-card">
+    <h2>📋 Como participar</h2>
+    <div class="passos">
+      <p><b>1.</b> Escolha seus números de <strong>000 a 999</strong>.</p>
+      <p><b>2.</b> Faça o pagamento via <strong>PIX</strong>.</p>
+      <p><b>3.</b> Envie o <strong>comprovante de pagamento</strong>.</p>
+      <p><b>4.</b> Aguarde a <strong>confirmação do pagamento</strong>.</p>
+      <p><b>5.</b> Após a confirmação, você terá direito à <strong>Raspadinha da Amizade</strong> 🍀.</p>
+    </div>
+  </section>
+
+  <section class="card glass raspadinha-destaque">
+    <div class="raspadinha-icone">🍀</div>
+    <h2>RASPADINHA DA AMIZADE</h2>
+    <p>Uma chance especial de ganhar e também ajudar o <strong>canil</strong> 🐾.</p>
+    <div class="premios-raspadinha">
+      <span>🎁 1 Liquidificador</span>
+      <span>🎁 1 Ferro elétrico</span>
+    </div>
+    <div class="raspadinha-status">🔒 Disponível somente após a confirmação e liberação do pagamento.</div>
+    <a class="btn" href="raspadinha.html">🍀 CONHECER A RASPADINHA</a>
+  </section>
+
+  <section class="card glass">
+    <h2>🎟️ Escolha sua sorte</h2>
+    <p>Selecione seus números de 000 a 999.</p>
+    <a class="btn" href="cartela.html">ESCOLHER NÚMEROS →</a>
+  </section>
+
+  <section class="glass">
+    <h2>🎁 Prêmio</h2>
+    <h3>Geladeira Midea Frost Free</h3>
+    <strong class="price">R$ 10,00 por número</strong>
+    <p>Sorteio: <strong id="dataSorteio">30/12/2026 • 20:00</strong></p>
+  </section>
+
+  <section class="glass">
+    <h2>🔍 Encontrar número</h2>
+    <input id="busca" inputmode="numeric" maxlength="3" placeholder="Ex.: 750">
+    <button class="btn" onclick="irNumero()">IR PARA O NÚMERO</button>
+  </section>
+
+  <section class="glass numero-sorte-card">
+    <div class="numero-sorte-icone">🍀</div>
+    <h2>NÚMERO DA SORTE</h2>
+    <p>Não é sorte, é esperança, solidariedade!</p>
+    <button id="btnNumeroSorte" class="btn">🍀 REVELAR MEU NÚMERO DA SORTE</button>
+    <div id="resultadoNumeroSorte" class="resultado-numero-sorte" hidden></div>
+  </section>
+</main>
+<footer>🔒 Rifa Solidária • <b>GilFest</b></footer>
+<script type="module" src="home.js"></script>
+<script>
+function irNumero(){
+  const n=(document.getElementById('busca').value||'').replace(/\D/g,'');
+  if(n!==''&&+n>=0&&+n<=999) location.href='cartela.html?numero='+String(+n).padStart(3,'0');
+}
+</script>
+</body>
+</html>

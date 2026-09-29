@@ -12,7 +12,8 @@ import {
 import {
     db,
     ref,
-    get
+    get,
+    update
 } from "./firebase.js";
 
 
@@ -54,6 +55,15 @@ const buscarAdmin =
 
 const btnExportar =
     document.getElementById("btnExportar");
+
+const dataSorteioAdmin =
+    document.getElementById("dataSorteioAdmin");
+
+const btnSalvarSorteio =
+    document.getElementById("btnSalvarSorteio");
+
+const statusSorteio =
+    document.getElementById("statusSorteio");
 
 
 // ==========================================================
@@ -795,6 +805,64 @@ async function exportarBackup() {
 
 
 // ==========================================================
+// CONFIGURAÇÃO DA DATA DO SORTEIO
+// ==========================================================
+
+function valorParaInputDateTime(valor) {
+    if (!valor) return "2026-12-30T20:00";
+    const data = new Date(valor);
+    if (Number.isNaN(data.getTime())) return "2026-12-30T20:00";
+    const partes = new Intl.DateTimeFormat("sv-SE", {
+        timeZone: "America/Sao_Paulo",
+        year: "numeric", month: "2-digit", day: "2-digit",
+        hour: "2-digit", minute: "2-digit", hourCycle: "h23"
+    }).formatToParts(data).reduce((o, p) => (o[p.type] = p.value, o), {});
+    return `${partes.year}-${partes.month}-${partes.day}T${partes.hour}:${partes.minute}`;
+}
+
+async function carregarDataSorteio() {
+    try {
+        const snap = await get(ref(db, "rifa/configuracao"));
+        const valor = snap.exists() ? snap.val().sorteio : null;
+        if (dataSorteioAdmin) dataSorteioAdmin.value = valorParaInputDateTime(valor);
+    } catch (erro) {
+        console.error("Erro ao carregar data do sorteio:", erro);
+        if (statusSorteio) statusSorteio.textContent = "Não foi possível carregar a data atual.";
+    }
+}
+
+async function salvarDataSorteio() {
+    if (!dataSorteioAdmin?.value) {
+        if (statusSorteio) statusSorteio.textContent = "Escolha uma data e um horário.";
+        return;
+    }
+
+    const valor = new Date(dataSorteioAdmin.value).toISOString();
+    if (btnSalvarSorteio) {
+        btnSalvarSorteio.disabled = true;
+        btnSalvarSorteio.textContent = "SALVANDO...";
+    }
+
+    try {
+        await update(ref(db, "rifa/configuracao"), {
+            sorteio: valor,
+            sorteioAtualizadoEm: Date.now()
+        });
+        if (statusSorteio) {
+            statusSorteio.textContent = "✅ Data do sorteio atualizada com sucesso.";
+        }
+    } catch (erro) {
+        console.error("Erro ao salvar data do sorteio:", erro);
+        if (statusSorteio) statusSorteio.textContent = "❌ Não foi possível salvar. Verifique sua permissão de administrador.";
+    } finally {
+        if (btnSalvarSorteio) {
+            btnSalvarSorteio.disabled = false;
+            btnSalvarSorteio.textContent = "💾 SALVAR DATA DO SORTEIO";
+        }
+    }
+}
+
+// ==========================================================
 // EVENTOS
 // ==========================================================
 
@@ -857,6 +925,15 @@ if (btnExportar) {
 
 }
 
+if (btnSalvarSorteio) {
+
+    btnSalvarSorteio.addEventListener(
+        "click",
+        salvarDataSorteio
+    );
+
+}
+
 
 // ==========================================================
 // OBSERVAR AUTENTICAÇÃO
@@ -870,6 +947,7 @@ observarAutenticacao(
             mostrarPainel();
 
             await carregarNumeros();
+            await carregarDataSorteio();
 
         } else {
 

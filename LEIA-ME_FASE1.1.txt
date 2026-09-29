@@ -1,0 +1,28 @@
+RIFA SOLIDÁRIA — FASE 1.1
+CORREÇÃO DO ERRO DE RESERVA
+
+1) Substitua os arquivos do projeto pelo conteúdo deste ZIP.
+
+2) NO FIREBASE:
+   Authentication > Sign-in method > Anonymous (Anônimo) > ATIVAR.
+
+3) NO REALTIME DATABASE:
+   Rules > cole o conteúdo de database.rules.json > Publicar.
+
+4) No GitHub Pages, aguarde a publicação e abra novamente a cartela.
+
+5) Teste escolhendo, por exemplo, 040 e 097.
+   Informe nome e WhatsApp e clique em CONFIRMAR RESERVA.
+
+RESULTADO ESPERADO:
+- Os números ficam em rifa/numeros/040 e rifa/numeros/097.
+- status = reservado
+- participanteId = usuário anônimo autenticado
+- reservaId = identificador da participação
+- expiraEm = aproximadamente 30 minutos após a reserva
+- uma participação é criada em rifa/reservas/{reservaId}
+- o WhatsApp é aberto com a mensagem da reserva.
+
+IMPORTANTE:
+Esta fase ainda não implementa a aprovação de pagamento nem a raspadinha final.
+Primeiro vamos confirmar que a reserva está funcionando corretamente.

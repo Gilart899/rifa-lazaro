@@ -1,0 +1,17 @@
+RIFA SOLIDÁRIA — REVISÃO ATUAL
+
+Esta versão reúne as alterações solicitadas para revisão antes da próxima fase.
+
+INCLUÍDO:
+- Cartão "Como participar" na página principal.
+- Removida a referência a exames do texto principal.
+- Cartão de destaque da Raspadinha da Amizade em prol do canil.
+- Cartão "Número da Sorte" no rodapé da página principal.
+- Opção administrativa para alterar data e horário do sorteio.
+- A nova data é salva em rifa/configuracao/sorteio e aparece na página principal.
+
+IMPORTANTE:
+- A lógica definitiva da Raspadinha ainda NÃO foi alterada nesta revisão.
+- O número da sorte é apenas uma revelação visual nesta etapa; a regra definitiva ainda pode ser ajustada.
+- A data salva pelo painel depende da conta administrativa ter permissão auth.token.admin === true nas regras atuais.
+- Revise esta versão antes de pedir a próxima implementação.

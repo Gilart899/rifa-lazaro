@@ -3,7 +3,7 @@
 // ============================================================
 
 import {
-    database,
+    db,
     ref,
     get,
     set
@@ -18,7 +18,7 @@ export async function inicializarBanco() {
 
     console.log("🔥 Verificando banco da rifa...");
 
-    const rifaRef = ref(database, "rifa");
+    const rifaRef = ref(db, "rifa");
 
     const snapshot = await get(rifaRef);
 

@@ -167,3 +167,19 @@ button{font-family:inherit}
   #grid{gap:4px!important}
   #grid button{font-size:11px;min-height:41px}
 }
+
+/* NOVOS CARTÕES */
+.como-participar-card h2,
+.numero-sorte-card h2,
+.raspadinha-destaque h2{text-align:center}
+.passos{display:grid;gap:10px;margin-top:15px}
+.passos p{margin:0;padding:11px 13px;border-radius:13px;background:rgba(124,255,0,.055);border:1px solid rgba(124,255,0,.13);line-height:1.45}
+.passos b{color:#9aff50;margin-right:5px}
+.raspadinha-destaque{border-color:rgba(124,255,0,.58);box-shadow:var(--shadow),0 0 30px rgba(124,255,0,.12),inset 0 0 35px rgba(124,255,0,.04)}
+.raspadinha-icone,.numero-sorte-icone{text-align:center;font-size:55px;margin-bottom:5px}
+.premios-raspadinha{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:16px 0}
+.premios-raspadinha span{padding:10px 14px;border:1px solid rgba(124,255,0,.3);border-radius:999px;background:rgba(124,255,0,.06);font-weight:800}
+.raspadinha-status{text-align:center;color:#d8e8d5;margin:14px 0 18px;line-height:1.45}
+.numero-sorte-card{border-color:rgba(124,255,0,.38);text-align:center}
+.numero-sorte-card p{color:var(--muted);font-weight:700}
+.resultado-numero-sorte{margin-top:16px;padding:18px;border-radius:18px;border:1px solid rgba(124,255,0,.55);background:linear-gradient(145deg,rgba(124,255,0,.13),rgba(0,0,0,.2));font-size:24px;font-weight:1000;color:#eaffdf;animation:rise .45s ease both}

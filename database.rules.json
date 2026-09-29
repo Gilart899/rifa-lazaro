@@ -2,27 +2,43 @@
   "rules": {
     ".read": false,
     ".write": false,
+
     "rifa": {
       "configuracao": {
         ".read": true,
         ".write": "auth != null && auth.token.admin === true"
       },
+
       "numeros": {
         ".read": true,
+
         "$numero": {
           ".read": true,
-          ".write": "auth != null && (auth.token.admin === true || (!data.exists() && newData.exists() && newData.child('participanteId').val() === auth.uid) || (data.child('status').val() === 'disponivel' && newData.child('status').val() === 'reservado' && newData.child('participanteId').val() === auth.uid) || (data.child('status').val() === 'reservado' && data.child('expiraEm').val() <= now && newData.child('status').val() === 'reservado' && newData.child('participanteId').val() === auth.uid))",
-          ".validate": "auth != null && (auth.token.admin === true || (newData.child('numero').val() === $numero && newData.child('status').val() === 'reservado' && newData.child('participanteId').val() === auth.uid && newData.child('participacaoId').isString() && newData.child('nome').isString() && newData.child('telefone').isString() && newData.child('criadoEm').isNumber() && newData.child('expiraEm').isNumber()))"
+          ".write": "auth != null && (auth.token.admin === true || (newData.exists() && ((data.child('status').val() === 'disponivel' && newData.child('status').val() === 'reservado' && newData.child('participanteId').val() === auth.uid) || (data.child('status').val() === 'reservado' && data.child('expiraEm').val() <= now && newData.child('status').val() === 'reservado' && newData.child('participanteId').val() === auth.uid) || (data.child('status').val() === 'reservado' && data.child('participanteId').val() === auth.uid && data.child('expiraEm').val() <= now && newData.child('status').val() === 'disponivel')))" ,
+          ".validate": "auth != null && (auth.token.admin === true || (newData.child('status').val() === 'reservado' && newData.child('numero').val() === $numero && newData.child('participanteId').val() === auth.uid && newData.child('pagamento').val() === false && newData.child('reservaId').isString() && newData.child('nome').isString() && newData.child('telefone').isString() && newData.child('criadoEm').isNumber() && newData.child('expiraEm').isNumber() && newData.child('expiraEm').val() > now) || (newData.child('status').val() === 'disponivel'))"
         }
       },
-      "participacoes": {
-        ".read": "auth != null",
-        "$id": {
+
+      "reservas": {
+        "$reservaId": {
           ".read": "auth != null && (auth.token.admin === true || data.child('participanteId').val() === auth.uid)",
-          ".write": "auth != null && (auth.token.admin === true || (!data.exists() && newData.child('participanteId').val() === auth.uid) || (data.child('participanteId').val() === auth.uid && newData.child('participanteId').val() === auth.uid && newData.child('status').val() === data.child('status').val() && newData.child('pagamentoStatus').val() === data.child('pagamentoStatus').val() && newData.child('raspadinhaLiberada').val() === data.child('raspadinhaLiberada').val() && newData.child('raspadinhaUsada').val() === data.child('raspadinhaUsada').val()))",
-          ".validate": "auth != null && newData.child('participanteId').isString() && newData.child('nome').isString() && newData.child('telefone').isString() && newData.child('numeros').hasChildren() && newData.child('valorTotal').isNumber() && newData.child('criadoEm').isNumber() && newData.child('expiraEm').isNumber()"
+          ".write": "auth != null && (auth.token.admin === true || (!data.exists() && newData.child('participanteId').val() === auth.uid && newData.child('status').val() === 'reservado') || (data.child('participanteId').val() === auth.uid && newData.child('participanteId').val() === auth.uid && newData.child('status').val() === 'reservado'))",
+          ".validate": "auth != null && (auth.token.admin === true || (newData.child('participanteId').val() === auth.uid && newData.child('reservaId').val() === $reservaId && newData.child('nome').isString() && newData.child('telefone').isString() && newData.child('numeros').hasChildren() && newData.child('quantidade').isNumber() && newData.child('valorUnitario').isNumber() && newData.child('valorTotal').isNumber() && newData.child('pagamento').val() === false && newData.child('pagamentoStatus').val() === 'aguardando_comprovante' && newData.child('status').val() === 'reservado' && newData.child('criadoEm').isNumber() && newData.child('expiraEm').isNumber()))"
         }
       },
+
+      "participantes": {
+        "$uid": {
+          ".read": "auth != null && (auth.token.admin === true || auth.uid === $uid)",
+          ".write": "auth != null && (auth.token.admin === true || auth.uid === $uid)"
+        }
+      },
+
+      "compras": {
+        ".read": "auth != null && auth.token.admin === true",
+        ".write": "auth != null && auth.token.admin === true"
+      },
+
       "raspadinha": {
         "configuracao": {
           ".read": true,
@@ -40,7 +56,8 @@
           ".read": "auth != null && auth.token.admin === true",
           ".write": false,
           "$jogada": {
-            ".read": "auth != null && (auth.token.admin === true || data.child('participanteId').val() === auth.uid)"
+            ".read": "auth != null && (auth.token.admin === true || data.child('participanteId').val() === auth.uid)",
+            ".write": false
           }
         }
       }
