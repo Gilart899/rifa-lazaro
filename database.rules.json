@@ -2,53 +2,45 @@
   "rules": {
     ".read": false,
     ".write": false,
-
     "rifa": {
-
       "configuracao": {
         ".read": true,
         ".write": "auth != null && auth.token.admin === true"
       },
-
       "numeros": {
-
         ".read": true,
-
         "$numero": {
           ".read": true,
-
-          ".write": "auth != null && auth.token.admin === true"
+          ".write": "auth != null && (auth.token.admin === true || (!data.exists() && newData.exists() && newData.child('participanteId').val() === auth.uid) || (data.child('status').val() === 'disponivel' && newData.child('status').val() === 'reservado' && newData.child('participanteId').val() === auth.uid) || (data.child('status').val() === 'reservado' && data.child('expiraEm').val() <= now && newData.child('status').val() === 'reservado' && newData.child('participanteId').val() === auth.uid))",
+          ".validate": "auth != null && (auth.token.admin === true || (newData.child('numero').val() === $numero && newData.child('status').val() === 'reservado' && newData.child('participanteId').val() === auth.uid && newData.child('participacaoId').isString() && newData.child('nome').isString() && newData.child('telefone').isString() && newData.child('criadoEm').isNumber() && newData.child('expiraEm').isNumber()))"
         }
       },
-
+      "participacoes": {
+        ".read": "auth != null",
+        "$id": {
+          ".read": "auth != null && (auth.token.admin === true || data.child('participanteId').val() === auth.uid)",
+          ".write": "auth != null && (auth.token.admin === true || (!data.exists() && newData.child('participanteId').val() === auth.uid) || (data.child('participanteId').val() === auth.uid && newData.child('participanteId').val() === auth.uid && newData.child('status').val() === data.child('status').val() && newData.child('pagamentoStatus').val() === data.child('pagamentoStatus').val() && newData.child('raspadinhaLiberada').val() === data.child('raspadinhaLiberada').val() && newData.child('raspadinhaUsada').val() === data.child('raspadinhaUsada').val()))",
+          ".validate": "auth != null && newData.child('participanteId').isString() && newData.child('nome').isString() && newData.child('telefone').isString() && newData.child('numeros').hasChildren() && newData.child('valorTotal').isNumber() && newData.child('criadoEm').isNumber() && newData.child('expiraEm').isNumber()"
+        }
+      },
       "raspadinha": {
-
         "configuracao": {
           ".read": true,
           ".write": "auth != null && auth.token.admin === true"
         },
-
         "premios": {
           ".read": "auth != null && auth.token.admin === true",
           ".write": "auth != null && auth.token.admin === true"
         },
-
         "novasChances": {
           ".read": "auth != null && auth.token.admin === true",
           ".write": "auth != null && auth.token.admin === true"
         },
-
         "jogadas": {
-
           ".read": "auth != null && auth.token.admin === true",
-
           ".write": false,
-
           "$jogada": {
-
-            ".read": "auth != null && (auth.token.admin === true || data.child('participanteId').val() === auth.uid)",
-
-            ".write": false
+            ".read": "auth != null && (auth.token.admin === true || data.child('participanteId').val() === auth.uid)"
           }
         }
       }

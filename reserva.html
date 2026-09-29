@@ -1,1 +1,202 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="style.css"><title>Reserva | Rifa Entre Amigos</title></head><body><main><section class="glass"><h1>✅ Confirmar participação</h1><div id="nums"></div><input id="nome" placeholder="Seu nome"><input id="fone" inputmode="tel" placeholder="WhatsApp"><button class="btn" id="confirmar">CONFIRMAR RESERVA</button><p id="msg"></p></section></main><script type="module">import {db} from "./firebase.js";import {ref,runTransaction} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";import {CONFIG} from "./config.js";let nums=JSON.parse(localStorage.getItem("rifaSelecionados")||"[]");document.getElementById("nums").textContent=nums.join(", ")+" • R$ "+(nums.length*CONFIG.valor).toFixed(2).replace(".",",");document.getElementById("confirmar").onclick=async()=>{let nome=document.getElementById("nome").value.trim(),fone=document.getElementById("fone").value.trim();if(!nome||!fone||!nums.length)return alert("Preencha nome e WhatsApp.");let ok=true;for(const n of nums){let r=ref(db,"numeros/"+n);let t=await runTransaction(r,v=>v?undefined:{numero:n,status:"reservado",nome,telefone:fone,pagamento:false,criadoEm:Date.now()});if(!t.committed)ok=false}document.getElementById("msg").textContent=ok?"Reserva realizada! Agora envie o comprovante pelo WhatsApp.":"Um ou mais números já foram ocupados.";if(ok)window.open("https://wa.me/"+CONFIG.whatsapp+"?text="+encodeURIComponent("Olá! Reservei os números "+nums.join(", ")+" da Rifa Entre Amigos. Nome: "+nome)," _blank")}</script></body></html>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="style.css">
+<title>Reserva | Rifa Entre Amigos</title>
+</head>
+
+<body>
+<main>
+<section class="glass">
+    <h1>✅ Confirmar participação</h1>
+
+    <p id="resumoNumeros">Carregando...</p>
+
+    <div style="display:grid;gap:10px">
+        <input id="nome" maxlength="80" placeholder="Seu nome">
+        <input id="fone" maxlength="20" inputmode="tel" placeholder="Seu WhatsApp">
+    </div>
+
+    <p>
+        ⏱️ Seus números ficarão reservados por
+        <strong>30 minutos</strong>.
+    </p>
+
+    <button class="btn" id="confirmar">
+        CONFIRMAR RESERVA
+    </button>
+
+    <p id="msg"></p>
+</section>
+</main>
+
+<script type="module">
+import {
+    db,
+    auth,
+    ref,
+    update
+} from "./firebase.js";
+
+import {
+    signInAnonymously
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+import { CONFIG } from "./config.js";
+
+const resumo = document.getElementById("resumoNumeros");
+const nomeInput = document.getElementById("nome");
+const foneInput = document.getElementById("fone");
+const botao = document.getElementById("confirmar");
+const msg = document.getElementById("msg");
+
+const numeros =
+    JSON.parse(
+        sessionStorage.getItem("rifaSelecionados") ||
+        localStorage.getItem("rifaSelecionados") ||
+        "[]"
+    );
+
+if (!numeros.length) {
+    resumo.textContent = "Nenhum número foi selecionado.";
+    botao.disabled = true;
+} else {
+    resumo.innerHTML =
+        `<strong>Números:</strong> ${numeros.join(", ")}<br>` +
+        `<strong>Total:</strong> R$ ${(numeros.length * CONFIG.valor)
+            .toFixed(2)
+            .replace(".", ",")}`;
+}
+
+function mostrarMensagem(texto, erro = false) {
+    msg.textContent = texto;
+    msg.style.color = erro ? "#ffb4b4" : "#b8ff9b";
+}
+
+function gerarIdParticipacao() {
+    return (
+        "P" +
+        Date.now().toString(36) +
+        Math.random().toString(36).slice(2, 8)
+    ).toUpperCase();
+}
+
+async function garantirUsuario() {
+    if (auth.currentUser) {
+        return auth.currentUser;
+    }
+
+    const resultado = await signInAnonymously(auth);
+    return resultado.user;
+}
+
+async function reservar() {
+    const nome = nomeInput.value.trim();
+    const telefone = foneInput.value.trim();
+
+    if (!nome || !telefone) {
+        mostrarMensagem("Preencha seu nome e WhatsApp.", true);
+        return;
+    }
+
+    if (!numeros.length || numeros.length > CONFIG.reserva.maxNumerosPorParticipacao) {
+        mostrarMensagem("Quantidade de números inválida.", true);
+        return;
+    }
+
+    botao.disabled = true;
+    botao.textContent = "RESERVANDO...";
+
+    try {
+        const usuario = await garantirUsuario();
+        const agora = Date.now();
+        const expiraEm =
+            agora + CONFIG.reserva.duracaoMinutos * 60 * 1000;
+
+        const participacaoId = gerarIdParticipacao();
+
+        const dados = {};
+
+        dados[`rifa/participacoes/${participacaoId}`] = {
+            id: participacaoId,
+            participanteId: usuario.uid,
+            nome,
+            telefone,
+            numeros,
+            quantidade: numeros.length,
+            valorTotal: numeros.length * CONFIG.valor,
+            status: "reservado",
+            pagamentoStatus: "aguardando_comprovante",
+            comprovanteEnviado: false,
+            raspadinhaLiberada: false,
+            raspadinhaUsada: false,
+            criadoEm: agora,
+            expiraEm
+        };
+
+        for (const numero of numeros) {
+            dados[`rifa/numeros/${numero}`] = {
+                numero,
+                status: "reservado",
+                participanteId: usuario.uid,
+                participacaoId,
+                nome,
+                telefone,
+                quantidade: numeros.length,
+                valorTotal: numeros.length * CONFIG.valor,
+                pagamento: false,
+                pagamentoStatus: "aguardando_comprovante",
+                criadoEm: agora,
+                expiraEm
+            };
+        }
+
+        await update(ref(db), dados);
+
+        sessionStorage.setItem(
+            "rifaParticipacaoId",
+            participacaoId
+        );
+
+        sessionStorage.setItem(
+            "rifaNumeros",
+            JSON.stringify(numeros)
+        );
+
+        localStorage.removeItem("rifaSelecionados");
+
+        resumo.innerHTML =
+            `<strong>Reserva criada!</strong><br>` +
+            `ID: ${participacaoId}<br>` +
+            `Números: ${numeros.join(", ")}<br>` +
+            `Validade: ${new Date(expiraEm).toLocaleString("pt-BR")}`;
+
+        mostrarMensagem(
+            "Reserva realizada. Agora enviaremos você para o próximo passo."
+        );
+
+        setTimeout(() => {
+            location.href =
+                "comprovante.html?participacao=" +
+                encodeURIComponent(participacaoId);
+        }, 1200);
+
+    } catch (erro) {
+        console.error("Erro ao reservar:", erro);
+
+        mostrarMensagem(
+            "Não foi possível reservar. Um dos números pode ter acabado de ser ocupado. Volte à cartela e tente novamente.",
+            true
+        );
+
+        botao.disabled = false;
+        botao.textContent = "CONFIRMAR RESERVA";
+    }
+}
+
+botao.addEventListener("click", reservar);
+</script>
+</body>
+</html>
