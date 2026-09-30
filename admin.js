@@ -419,36 +419,123 @@ function limparEstatisticas() {
 // ==========================================================
 
 function renderizarTabela(numeros) {
-    if (!listaNumeros) return;
 
-    const lista = [...numeros].sort((a,b) => Number(a.numero)-Number(b.numero));
+    if (!listaNumeros) {
+
+        return;
+
+    }
+
+
+    const lista =
+        [...numeros].sort(
+            (a, b) =>
+                Number(a.numero) -
+                Number(b.numero)
+        );
+
+
     listaNumeros.innerHTML = "";
 
+
     lista.forEach(numero => {
-        const tr = document.createElement("tr");
-        const status = numero.status || "disponivel";
-        const nome = numero.nome || "—";
-        const whatsapp = numero.telefone || numero.whatsapp || "—";
-        const pagamento = numero.pagamento === true;
-        const raspadinha = numero.raspadinhaLiberada === true;
-        const comprovante = numero.comprovanteEnviado === true;
+
+        const tr =
+            document.createElement("tr");
+
+
+        const status =
+            numero.status ||
+            "disponivel";
+
+
+        const nome =
+            numero.nome ||
+            "—";
+
+
+        const whatsapp =
+            numero.whatsapp ||
+            "—";
+
+
+        const pagamento =
+            numero.pagamento === true;
+
+
+        const raspadinha =
+            numero.raspadinhaLiberada === true;
+
 
         tr.innerHTML = `
-            <td><strong>${formatarNumero(numero.numero)}</strong></td>
-            <td>${escaparHTML(nome)}</td>
-            <td>${escaparHTML(whatsapp)}</td>
-            <td><span class="badge ${status}">${textoStatus(status)}</span></td>
-            <td><span class="badge ${pagamento ? "sim" : "nao"}">${pagamento ? "Confirmado" : (comprovante ? "Comprovante" : "Pendente")}</span></td>
-            <td><span class="badge ${raspadinha ? "sim" : "nao"}">${raspadinha ? "Liberada" : "Não"}</span></td>
-            <td><div class="acoes-numero">
-                <button type="button" data-numero="${numero.numero}" class="btn-ver-numero">Ver</button>
-            </div></td>`;
+
+            <td>
+                <strong>
+                    ${formatarNumero(numero.numero)}
+                </strong>
+            </td>
+
+            <td>
+                ${escaparHTML(nome)}
+            </td>
+
+            <td>
+                ${escaparHTML(whatsapp)}
+            </td>
+
+            <td>
+                <span class="badge ${status}">
+                    ${textoStatus(status)}
+                </span>
+            </td>
+
+            <td>
+                <span class="badge ${pagamento ? "sim" : "nao"}">
+                    ${pagamento ? "Confirmado" : "Pendente"}
+                </span>
+            </td>
+
+            <td>
+                <span class="badge ${raspadinha ? "sim" : "nao"}">
+                    ${raspadinha ? "Liberada" : "Não"}
+                </span>
+            </td>
+
+            <td>
+                <div class="acoes-numero">
+
+                    <button
+                        type="button"
+                        data-numero="${numero.numero}"
+                        class="btn-ver-numero">
+
+                        Ver
+
+                    </button>
+
+                </div>
+            </td>
+
+        `;
+
+
         listaNumeros.appendChild(tr);
+
     });
 
-    if (contadorTabela) contadorTabela.textContent = `${lista.length} registros`;
+
+    if (contadorTabela) {
+
+        contadorTabela.textContent =
+            `${lista.length} registros`;
+
+    }
+
+
     configurarBotoesTabela();
+
 }
+
 
 // ==========================================================
 // TEXTO DO STATUS
@@ -501,143 +588,47 @@ function escaparHTML(valor) {
 // ==========================================================
 
 function configurarBotoesTabela() {
-    document.querySelectorAll(".btn-ver-numero").forEach(botao => {
-        botao.addEventListener("click", () => abrirDetalhesNumero(botao.dataset.numero));
-    });
+
+    document
+        .querySelectorAll(".btn-ver-numero")
+        .forEach(botao => {
+
+            botao.addEventListener(
+                "click",
+                () => {
+
+                    const numero =
+                        botao.dataset.numero;
+
+                    mostrarNumero(
+                        numero
+                    );
+
+                }
+            );
+
+        });
+
 }
 
-async function abrirDetalhesNumero(numero) {
-    try {
-        const snap = await get(ref(db, `rifa/numeros/${numero}`));
-        if (!snap.exists()) return alert("Número não encontrado.");
-        const dados = snap.val();
-        const reservaId = dados.reservaId || "";
-        let reserva = null;
-        if (reservaId) {
-            const rs = await get(ref(db, `rifa/reservas/${reservaId}`));
-            reserva = rs.exists() ? rs.val() : null;
-        }
-        mostrarModalParticipacao(numero, dados, reserva);
-    } catch (erro) {
-        console.error(erro);
-        alert("Não foi possível carregar os dados desta participação.");
-    }
+
+// ==========================================================
+// VISUALIZAR NÚMERO
+// ==========================================================
+
+function mostrarNumero(numero) {
+
+    const mensagem =
+        `Número ${formatarNumero(numero)}`;
+
+    console.log(
+        mensagem
+    );
+
+    alert(mensagem);
+
 }
 
-function fecharModalParticipacao() {
-    document.getElementById("modalParticipacao")?.remove();
-}
-
-function mostrarModalParticipacao(numero, dados, reserva) {
-    fecharModalParticipacao();
-    const modal = document.createElement("div");
-    modal.id = "modalParticipacao";
-    modal.className = "admin-modal-backdrop";
-    const comprovante = reserva?.comprovante?.dataUrl || "";
-    const numeros = reserva?.numeros || [numero];
-    const valor = Number(reserva?.valorTotal || numeros.length * 10);
-    const status = reserva?.status || dados.status || "reservado";
-    const aprovado = dados.pagamento === true || reserva?.pagamento === true;
-    const liberada = dados.raspadinhaLiberada === true || reserva?.raspadinhaLiberada === true;
-    modal.innerHTML = `
-      <div class="admin-modal glass">
-        <button class="modal-fechar" type="button">✕</button>
-        <h2>🧾 Participação ${formatarNumero(numero)}</h2>
-        <div class="modal-dados">
-          <p><b>Cliente:</b> ${escaparHTML(reserva?.nome || dados.nome || "—")}</p>
-          <p><b>WhatsApp:</b> ${escaparHTML(reserva?.telefone || dados.telefone || dados.whatsapp || "—")}</p>
-          <p><b>Números:</b> ${escaparHTML(numeros.join(", "))}</p>
-          <p><b>Valor:</b> ${formatarMoeda(valor)}</p>
-          <p><b>Status:</b> ${escaparHTML(status)}</p>
-          <p><b>Pagamento:</b> ${aprovado ? "✅ APROVADO" : "⏳ AGUARDANDO"}</p>
-          <p><b>Raspadinha:</b> ${liberada ? "🍀 LIBERADA" : "🔒 BLOQUEADA"}</p>
-          ${reserva?.criadoEm ? `<p><b>Reserva:</b> ${new Date(Number(reserva.criadoEm)).toLocaleString("pt-BR")}</p>` : ""}
-        </div>
-        <div class="modal-comprovante">
-          <h3>📎 Comprovante</h3>
-          ${comprovante ? `<img src="${comprovante}" alt="Comprovante enviado pelo cliente">` : `<div class="sem-comprovante">Nenhum comprovante enviado ainda.</div>`}
-        </div>
-        <div class="modal-acoes">
-          ${!aprovado && reserva ? `<button id="btnAprovarParticipacao" class="btn btn-success" type="button">✅ APROVAR PAGAMENTO E LIBERAR RASPADINHA</button>` : ""}
-          ${!aprovado && reserva ? `<button id="btnCancelarParticipacao" class="btn btn-danger" type="button">❌ CANCELAR PARTICIPAÇÃO</button>` : ""}
-          ${aprovado ? `<div class="aprovado-aviso">✅ Pagamento aprovado${reserva?.raspadinhaPremio ? ` • Raspadinha preparada: ${escaparHTML(reserva.raspadinhaPremio)}` : ""}</div>` : ""}
-        </div>
-        <p id="modalMensagem" class="modal-mensagem"></p>
-      </div>`;
-    document.body.appendChild(modal);
-    modal.querySelector(".modal-fechar").onclick = fecharModalParticipacao;
-    modal.addEventListener("click", e => { if(e.target === modal) fecharModalParticipacao(); });
-    modal.querySelector("#btnAprovarParticipacao")?.addEventListener("click", () => aprovarParticipacao(reserva, numero));
-    modal.querySelector("#btnCancelarParticipacao")?.addEventListener("click", () => cancelarParticipacao(reserva, numero));
-}
-
-async function aprovarParticipacao(reserva, numeroReferencia) {
-    if (!reserva?.reservaId) return;
-    const mensagem = document.getElementById("modalMensagem");
-    const btn = document.getElementById("btnAprovarParticipacao");
-    if (btn) { btn.disabled = true; btn.textContent = "APROVANDO..."; }
-    try {
-        const todas = await get(ref(db, "rifa/reservas"));
-        const reservas = todas.exists() ? Object.values(todas.val()) : [];
-        const usados = reservas.filter(r => r.status === "vendido" && r.raspadinhaPremio && r.raspadinhaPremio !== "Não foi dessa vez").map(r => r.raspadinhaPremio);
-        const disponiveis = ["Liquidificador", "Ferro elétrico"].filter(p => !usados.includes(p));
-        let premio = "Não foi dessa vez";
-        if (disponiveis.length) premio = disponiveis[Math.floor(Math.random()*disponiveis.length)];
-
-        const updates = {};
-        const agora = Date.now();
-        for (const n of (reserva.numeros || [numeroReferencia])) {
-            updates[`rifa/numeros/${n}/status`] = "vendido";
-            updates[`rifa/numeros/${n}/pagamento`] = true;
-            updates[`rifa/numeros/${n}/pagamentoStatus`] = "aprovado";
-            updates[`rifa/numeros/${n}/raspadinhaLiberada`] = true;
-            updates[`rifa/numeros/${n}/raspadinhaUsada`] = false;
-            updates[`rifa/numeros/${n}/dataVenda`] = agora;
-            updates[`rifa/numeros/${n}/comprovanteEnviado`] = reserva.comprovanteEnviado === true;
-            updates[`rifa/numeros/${n}/reservaId`] = reserva.reservaId;
-        }
-        updates[`rifa/reservas/${reserva.reservaId}/status`] = "vendido";
-        updates[`rifa/reservas/${reserva.reservaId}/pagamento`] = true;
-        updates[`rifa/reservas/${reserva.reservaId}/pagamentoStatus`] = "aprovado";
-        updates[`rifa/reservas/${reserva.reservaId}/raspadinhaLiberada`] = true;
-        updates[`rifa/reservas/${reserva.reservaId}/raspadinhaUsada`] = false;
-        updates[`rifa/reservas/${reserva.reservaId}/raspadinhaPremio`] = premio;
-        updates[`rifa/reservas/${reserva.reservaId}/pagamentoAprovadoEm`] = agora;
-        updates[`rifa/reservas/${reserva.reservaId}/aprovadoPor`] = "administrador";
-        await update(ref(db), updates);
-        if (mensagem) mensagem.textContent = `✅ Pagamento aprovado. Raspadinha liberada. Resultado preparado: ${premio}.`;
-        await carregarNumeros();
-        setTimeout(fecharModalParticipacao, 1000);
-    } catch(e) {
-        console.error(e);
-        if (mensagem) mensagem.textContent = "❌ Não foi possível aprovar. Verifique as regras do Firebase.";
-        if (btn) { btn.disabled = false; btn.textContent = "✅ APROVAR PAGAMENTO E LIBERAR RASPADINHA"; }
-    }
-}
-
-async function cancelarParticipacao(reserva, numeroReferencia) {
-    if (!reserva?.reservaId) return;
-    const motivo = prompt("Informe o motivo do cancelamento:", "Pagamento não confirmado");
-    if (motivo === null) return;
-    try {
-        const updates = {};
-        const agora = Date.now();
-        for (const n of (reserva.numeros || [numeroReferencia])) {
-            updates[`rifa/numeros/${n}`] = { numero:n, status:"disponivel", nome:"", telefone:"", pagamento:false, pagamentoStatus:"cancelado", participanteId:"", reservaId:"", criadoEm:"", expiraEm:"", comprovanteEnviado:false, raspadinhaLiberada:false, raspadinhaUsada:false, dataVenda:"" };
-        }
-        updates[`rifa/reservas/${reserva.reservaId}/status`] = "cancelado";
-        updates[`rifa/reservas/${reserva.reservaId}/pagamentoStatus`] = "cancelado";
-        updates[`rifa/reservas/${reserva.reservaId}/pagamento`] = false;
-        updates[`rifa/reservas/${reserva.reservaId}/raspadinhaLiberada`] = false;
-        updates[`rifa/reservas/${reserva.reservaId}/canceladoEm`] = agora;
-        updates[`rifa/reservas/${reserva.reservaId}/canceladoPor`] = "administrador";
-        updates[`rifa/reservas/${reserva.reservaId}/motivoCancelamento`] = motivo.trim() || "Sem motivo informado";
-        await update(ref(db), updates);
-        alert("Participação cancelada e números liberados novamente.");
-        fecharModalParticipacao();
-        await carregarNumeros();
-    } catch(e) { console.error(e); alert("Não foi possível cancelar. Verifique as regras do Firebase."); }
-}
 
 // ==========================================================
 // BUSCA ADMINISTRATIVA

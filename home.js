@@ -23,31 +23,24 @@ async function carregarConfiguracao() {
   }
 }
 
-function numeroAleatorio() {
-  return String(Math.floor(Math.random() * 1000)).padStart(3, "0");
+function numeroDaSorte() {
+  const salvo = localStorage.getItem("rifaNumeroDaSorte");
+  if (/^\d{3}$/.test(salvo || "")) return salvo;
+  const novo = String(Math.floor(Math.random() * 1000)).padStart(3, "0");
+  localStorage.setItem("rifaNumeroDaSorte", novo);
+  return novo;
 }
 
-function revelarNumeroDaSorte() {
-  const salvo = localStorage.getItem("rifaNumeroDaSorte");
-  const numero = salvo || numeroAleatorio();
-  localStorage.setItem("rifaNumeroDaSorte", numero);
+btnSorte?.addEventListener("click", () => {
   if (!resultadoSorte) return;
+  const numero = numeroDaSorte();
   resultadoSorte.hidden = false;
   resultadoSorte.textContent = `🍀 Seu número da sorte é: ${numero}`;
-  if (btnSorte) {
-    btnSorte.disabled = true;
-    btnSorte.textContent = "🍀 NÚMERO REVELADO";
-  }
-}
-
-const numeroSalvo = localStorage.getItem("rifaNumeroDaSorte");
-if (numeroSalvo && resultadoSorte && btnSorte) {
-  resultadoSorte.hidden = false;
-  resultadoSorte.textContent = `🍀 Seu número da sorte é: ${numeroSalvo}`;
-  btnSorte.disabled = true;
-  btnSorte.textContent = "🍀 NÚMERO REVELADO";
-}
-
-btnSorte?.addEventListener("click", revelarNumeroDaSorte);
+  btnSorte.textContent = "🍀 NÚMERO REVELADO — IR PARA A CARTELA";
+  btnSorte.onclick = () => {
+    localStorage.setItem("rifaSelecionados", JSON.stringify([numero]));
+    location.href = `cartela.html?numero=${encodeURIComponent(numero)}`;
+  };
+});
 
 carregarConfiguracao();

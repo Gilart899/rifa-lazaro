@@ -1212,12 +1212,3 @@ width:100%;
 /* ==========================================================
    FIM DO ARQUIVO
    ===
-
-/* MODAL DE PARTICIPAÇÃO / COMPROVANTE */
-.admin-modal-backdrop{position:fixed;inset:0;z-index:5000;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.72);backdrop-filter:blur(8px)}
-.admin-modal{position:relative;width:min(720px,96vw);max-height:92vh;overflow:auto;background:linear-gradient(145deg,#06220a,#103f18);color:#efffea;border:1px solid rgba(124,255,0,.35);box-shadow:0 25px 70px rgba(0,0,0,.55)}
-.modal-fechar{position:absolute;right:14px;top:14px;width:42px;height:42px;border:0;border-radius:50%;background:#b91818;color:#fff;font-size:20px;font-weight:900;cursor:pointer}
-.modal-dados{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:18px 0}.modal-dados p{margin:0;padding:11px 13px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(124,255,0,.12)}
-.modal-comprovante{margin-top:18px;padding:16px;border-radius:16px;background:rgba(0,0,0,.22);text-align:center}.modal-comprovante h3{margin-top:0}.modal-comprovante img{display:block;max-width:100%;max-height:440px;margin:10px auto;border-radius:14px;object-fit:contain;background:#fff}.sem-comprovante{padding:30px;border:1px dashed rgba(255,255,255,.25);border-radius:12px;color:#b8cbb8}
-.modal-acoes{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}.modal-acoes .btn{flex:1;min-width:230px}.btn-success{background:linear-gradient(180deg,#69dc18,#238f12)!important}.btn-danger{background:linear-gradient(180deg,#ff5a4d,#b81717)!important;border-color:#ffaaa5!important}.aprovado-aviso{width:100%;padding:15px;border-radius:14px;background:rgba(124,255,0,.12);border:1px solid rgba(124,255,0,.3);font-weight:900}.modal-mensagem{min-height:24px;text-align:center;font-weight:800;margin-bottom:0}
-@media(max-width:650px){.modal-dados{grid-template-columns:1fr}.admin-modal{padding:18px!important}.modal-acoes .btn{min-width:100%}}

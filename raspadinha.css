@@ -29,4 +29,5 @@
 .premios-card{padding:22px;text-align:center}.premios-card h2{margin:0 0 8px}
 @media(max-width:600px){.raspadinha-container{width:94%;padding-top:12px}.raspadinha-card{padding:15px}.confirmacao-dados{grid-template-columns:1fr;padding:14px}.pix-linha{grid-template-columns:1fr}.acao-copiar{width:100%}.boa-sorte{flex-direction:column;text-align:center}.boa-sorte span{text-align:center}.dado-box strong{font-size:1rem}}
 
-.status-raspadinha{margin:10px auto 4px;max-width:700px;padding:12px 16px;border-radius:14px;background:rgba(124,255,0,.08);border:1px solid rgba(124,255,0,.18);color:#eaffdf;font-weight:800;line-height:1.4}.controles-raspadinha button:disabled{opacity:.58;cursor:not-allowed;filter:grayscale(.15)}
+.dados-participante{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 20px 12px}.dados-participante input{margin:0}.status-reserva{margin:0 20px 16px;padding:16px;border-radius:16px;background:#e8ffe9;border:1px solid #bce8c3;color:#07551a;text-align:center;line-height:1.5}.comprovante-acoes{display:grid;gap:10px;padding:0 20px 20px}.raspadinha-info-card{text-align:center;border-color:rgba(124,255,0,.45)}
+@media(max-width:600px){.dados-participante{grid-template-columns:1fr}}

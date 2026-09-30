@@ -1,23 +1,17 @@
-<!doctype html>
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="stylesheet" href="style.css">
-<title>Reserva | Rifa Entre Amigos</title>
-</head>
-<body>
-<main>
-<section class="glass">
-<h1>✅ Confirmar participação</h1>
-<div id="nums">Carregando...</div>
-<input id="nome" autocomplete="name" placeholder="Seu nome">
-<input id="fone" inputmode="tel" autocomplete="tel" placeholder="WhatsApp">
-<p>⏱️ Seus números ficarão reservados por <strong>30 minutos</strong>.</p>
-<button class="btn" id="confirmar" type="button">CONFIRMAR RESERVA</button>
-<p id="msg" aria-live="polite"></p>
-</section>
-</main>
-<script type="module" src="reserva.js"></script>
-</body>
-</html>
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="raspadinha.css"><title>Confirmar participação | Rifa Entre Amigos</title></head><body><main class="raspadinha-container">
+<section class="hero"><div class="clover">🍀</div><h1>CONFIRMAR<br><span style="color:#7cff00">PARTICIPAÇÃO</span></h1><p>Confira os dados da sua compra e informe seus dados.</p></section>
+<section class="glass confirmacao-card" id="confirmacaoParticipacao">
+  <div class="confirmacao-cabecalho"><div class="confirmacao-icone">🧾</div><div><h2>CONFIRMAR PARTICIPAÇÃO</h2><p>Confira os dados da sua compra e informe seus dados.</p></div></div>
+  <div class="confirmacao-dados">
+    <div class="dado-box"><span class="dado-icone">🎟️</span><div><small>Número comprado</small><strong id="confirmacaoNumeros">---</strong></div></div>
+    <div class="dado-box"><span class="dado-icone">💰</span><div><small>Valor</small><strong id="confirmacaoValor">---</strong></div></div>
+    <div class="dado-box"><span class="dado-icone">📅</span><div><small>Data da compra</small><strong id="confirmacaoData">---</strong></div></div>
+    <div class="dado-box"><span class="dado-icone">🕐</span><div><small>Hora da compra</small><strong id="confirmacaoHora">---</strong></div></div>
+  </div>
+  <div class="dados-participante"><input id="nome" autocomplete="name" placeholder="Seu nome"><input id="fone" inputmode="tel" autocomplete="tel" placeholder="WhatsApp"></div>
+  <button class="acao-confirmacao acao-limpar" id="limparNumeros" type="button">🗑️ LIMPAR E ESCOLHER OUTROS NÚMEROS</button>
+  <div class="pix-box"><h3>💚 Pagamento via PIX</h3><p>Utilize a chave PIX abaixo para realizar o pagamento.</p><div class="pix-linha"><div class="pix-chave"><span>PIX</span><strong id="pixChave">---</strong></div><button class="acao-confirmacao acao-copiar" id="copiarPix" type="button">📋 COPIAR PIX</button></div><button class="acao-confirmacao acao-comprovante" id="confirmar" type="button">✅ CONFIRMAR RESERVA</button><p id="mensagemPix" class="mensagem-pix" aria-live="polite"></p></div>
+  <div class="status-reserva" id="statusReserva" hidden></div>
+  <div class="comprovante-acoes" id="acoesComprovante" hidden><button class="acao-confirmacao acao-comprovante" id="enviarComprovante" type="button">📎 ENVIAR COMPROVANTE</button><button class="btn" type="button" onclick="location.href='cartela.html'">← VOLTAR À CARTELA</button></div>
+  <div class="boa-sorte">🍀 <strong>Boa Sorte!</strong><span>Juntos fazemos a diferença! 💚</span></div>
+</section></main><script type="module" src="reserva.js"></script></body></html>
