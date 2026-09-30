@@ -97,6 +97,8 @@
 </style>
 
 
+<style>
+.envio-comprovante{margin:24px 0 0;padding:20px;border-radius:18px;background:linear-gradient(135deg,#e8ffe9,#d8f7dc);border:1px solid #bce8c3;text-align:left;color:#07551a}.envio-comprovante h3{margin:0 0 7px}.envio-comprovante p{color:#315f3a;font-weight:600}.envio-comprovante input{background:#fff;border:1px solid #bce8c3;border-radius:12px;padding:12px;width:100%;box-sizing:border-box}.envio-comprovante .btn{width:100%;margin-top:12px}.status-envio{text-align:center;min-height:22px;margin-bottom:0!important}</style>
 </head>
 
 
@@ -274,6 +276,17 @@ Pagamento via PIX
 
 
 <!-- ==========================================
+     ENVIO DO COMPROVANTE
+========================================== -->
+<div class="envio-comprovante" id="envioComprovante">
+  <h3>📎 Enviar comprovante de pagamento</h3>
+  <p>Escolha a foto ou captura de tela do comprovante do PIX. O comprovante será enviado para análise do administrador.</p>
+  <input id="arquivoComprovante" type="file" accept="image/*" capture="environment">
+  <button id="btnEnviarComprovante" class="btn btn-primary" type="button">📤 ENVIAR COMPROVANTE</button>
+  <p id="statusEnvio" class="status-envio" aria-live="polite"></p>
+</div>
+
+<!-- ==========================================
      AÇÕES
 ========================================== -->
 
@@ -376,7 +389,7 @@ Rifa Solidária
 ========================================== -->
 
 
-<script src="config.js"></script>
+<script src="config-global.js"></script>
 
 
 
@@ -434,6 +447,70 @@ if(
 
 
 
+<script type="module">
+import { db, auth, ref, get, update, signInAnonymously } from "./firebase.js";
+import { CONFIG } from "./config.js";
+
+const params = new URLSearchParams(location.search);
+const reservaId = params.get("reservaId") || localStorage.getItem("rifaReservaId") || "";
+const nomeEl=document.getElementById("nomeCliente"), telefoneEl=document.getElementById("telefoneCliente"), numeroEl=document.getElementById("numeroCliente"), valorEl=document.getElementById("valorCliente"), dataEl=document.getElementById("dataCliente");
+const arquivo=document.getElementById("arquivoComprovante"), btn=document.getElementById("btnEnviarComprovante"), status=document.getElementById("statusEnvio");
+let usuario=null, reserva=null;
+
+function msg(t,erro=false){if(status){status.textContent=t;status.style.color=erro?"#a51616":"#087b25"}}
+async function authAnon(){if(auth.currentUser)return auth.currentUser;return (await signInAnonymously(auth)).user}
+async function carregar(){
+  if(!reservaId){msg("Reserva não encontrada. Volte e faça a participação novamente.",true);if(btn)btn.disabled=true;return}
+  try{
+    usuario=await authAnon();
+    const snap=await get(ref(db,`rifa/reservas/${reservaId}`));
+    if(!snap.exists()){msg("Esta reserva não foi encontrada.",true);btn.disabled=true;return}
+    reserva=snap.val();
+    if(reserva.participanteId!==usuario.uid){msg("Esta reserva não pertence a este participante.",true);btn.disabled=true;return}
+    nomeEl.textContent=reserva.nome||"---"; telefoneEl.textContent=reserva.telefone||"---"; numeroEl.textContent=(reserva.numeros||[]).join(", ")||"---"; valorEl.textContent=Number(reserva.valorTotal||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+    const d=new Date(Number(reserva.criadoEm||Date.now())); dataEl.textContent=d.toLocaleDateString("pt-BR");
+    if(reserva.comprovanteEnviado){msg("✅ Comprovante já enviado. Aguarde a análise do administrador.");btn.disabled=true;arquivo.disabled=true;}
+  }catch(e){console.error(e);msg("Não foi possível carregar a participação.",true)}
+}
+
+function lerArquivo(file){return new Promise((resolve,reject)=>{const fr=new FileReader();fr.onload=()=>resolve(fr.result);fr.onerror=reject;fr.readAsDataURL(file)})}
+async function comprimirImagem(file){
+  if(file.size>6*1024*1024) throw new Error("A imagem é muito grande. Escolha uma imagem de até 6 MB.");
+  const data=await lerArquivo(file);
+  const img=new Image();
+  await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;img.src=data});
+  const max=1200, escala=Math.min(1,max/Math.max(img.width,img.height));
+  const canvas=document.createElement("canvas");canvas.width=Math.max(1,Math.round(img.width*escala));canvas.height=Math.max(1,Math.round(img.height*escala));
+  const c=canvas.getContext("2d");c.drawImage(img,0,0,canvas.width,canvas.height);
+  let qualidade=.76, out=canvas.toDataURL("image/jpeg",qualidade);
+  while(out.length>520000 && qualidade>.45){qualidade-=.06;out=canvas.toDataURL("image/jpeg",qualidade)}
+  if(out.length>700000) throw new Error("Não foi possível reduzir a imagem. Escolha uma foto menor.");
+  return out;
+}
+
+btn?.addEventListener("click",async()=>{
+  const file=arquivo?.files?.[0];
+  if(!file)return msg("Selecione a foto do comprovante primeiro.",true);
+  btn.disabled=true;btn.textContent="ENVIANDO...";msg("Preparando o comprovante...");
+  try{
+    const dataUrl=await comprimirImagem(file);
+    const agora=Date.now();
+    const updates = {
+      [`rifa/reservas/${reservaId}/comprovanteEnviado`]: true,
+      [`rifa/reservas/${reservaId}/pagamentoStatus`]: "aguardando_analise",
+      [`rifa/reservas/${reservaId}/comprovante`]: {dataUrl,fileName:file.name,mimeType:"image/jpeg",enviadoEm:agora}
+    };
+    for (const numero of (reserva.numeros || [])) {
+      updates[`rifa/numeros/${numero}/comprovanteEnviado`] = true;
+    }
+    await update(ref(db), updates);
+    msg("✅ Comprovante enviado com sucesso! Agora aguarde a confirmação do administrador.");
+    btn.textContent="✅ COMPROVANTE ENVIADO";arquivo.disabled=true;
+  }catch(e){console.error(e);msg(e.message||"Não foi possível enviar o comprovante.",true);btn.disabled=false;btn.textContent="📤 ENVIAR COMPROVANTE"}
+});
+
+carregar();
+</script>
 </body>
 
 

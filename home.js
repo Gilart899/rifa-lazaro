@@ -27,13 +27,27 @@ function numeroAleatorio() {
   return String(Math.floor(Math.random() * 1000)).padStart(3, "0");
 }
 
-btnSorte?.addEventListener("click", () => {
+function revelarNumeroDaSorte() {
+  const salvo = localStorage.getItem("rifaNumeroDaSorte");
+  const numero = salvo || numeroAleatorio();
+  localStorage.setItem("rifaNumeroDaSorte", numero);
   if (!resultadoSorte) return;
-  const numero = numeroAleatorio();
   resultadoSorte.hidden = false;
   resultadoSorte.textContent = `🍀 Seu número da sorte é: ${numero}`;
+  if (btnSorte) {
+    btnSorte.disabled = true;
+    btnSorte.textContent = "🍀 NÚMERO REVELADO";
+  }
+}
+
+const numeroSalvo = localStorage.getItem("rifaNumeroDaSorte");
+if (numeroSalvo && resultadoSorte && btnSorte) {
+  resultadoSorte.hidden = false;
+  resultadoSorte.textContent = `🍀 Seu número da sorte é: ${numeroSalvo}`;
   btnSorte.disabled = true;
   btnSorte.textContent = "🍀 NÚMERO REVELADO";
-});
+}
+
+btnSorte?.addEventListener("click", revelarNumeroDaSorte);
 
 carregarConfiguracao();

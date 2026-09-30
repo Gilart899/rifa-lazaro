@@ -1,0 +1,14 @@
+// Ponte para scripts antigos que usam CONFIG global.
+window.CONFIG = {
+  nome: "Rifa Entre Amigos",
+  beneficiada: "Dona Bené",
+  premio: "Geladeira Midea Frost Free",
+  valor: 10,
+  valorNumero: 10,
+  quantidade: 1000,
+  quantidadeNumeros: 1000,
+  sorteio: "2026-12-30T23:00:00.000Z",
+  whatsapp: "5579999145044",
+  pix: { chave: "045.761.515-09", texto: "045.761.515-09" },
+  raspadinha: { premio: "Prêmio da Raspadinha" }
+};

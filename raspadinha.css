@@ -28,3 +28,5 @@
 .boa-sorte{margin:0 20px 20px;padding:16px 20px;border-radius:16px;background:linear-gradient(135deg,#0a731f,#2caa3f);color:#fff;display:flex;align-items:center;justify-content:space-between;gap:15px;font-size:1.25rem}.boa-sorte strong{font-size:1.5rem}.boa-sorte span{font-weight:800;text-align:right}
 .premios-card{padding:22px;text-align:center}.premios-card h2{margin:0 0 8px}
 @media(max-width:600px){.raspadinha-container{width:94%;padding-top:12px}.raspadinha-card{padding:15px}.confirmacao-dados{grid-template-columns:1fr;padding:14px}.pix-linha{grid-template-columns:1fr}.acao-copiar{width:100%}.boa-sorte{flex-direction:column;text-align:center}.boa-sorte span{text-align:center}.dado-box strong{font-size:1rem}}
+
+.status-raspadinha{margin:10px auto 4px;max-width:700px;padding:12px 16px;border-radius:14px;background:rgba(124,255,0,.08);border:1px solid rgba(124,255,0,.18);color:#eaffdf;font-weight:800;line-height:1.4}.controles-raspadinha button:disabled{opacity:.58;cursor:not-allowed;filter:grayscale(.15)}
