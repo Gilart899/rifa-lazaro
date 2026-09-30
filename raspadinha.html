@@ -1,1 +1,100 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="style.css"><title>Raspadinha da Amizade</title></head><body><main><section class="hero"><div class="clover">🍀</div><h1>RASPADINHA<br><span style="color:#7cff00">DA AMIZADE</span></h1><p>Uma pequena surpresa pode estar esperando por você.</p></section><section class="glass" style="text-align:center"><canvas id="cv" width="700" height="360" style="width:100%;border-radius:18px;background:#ddd"></canvas><h2 id="res">RASPE AQUI</h2><button class="btn" id="raspar">🍀 RASPAR AGORA</button></section><section class="glass"><h2>🎁 Prêmios</h2><p>🍹 Liquidificador &nbsp; OU &nbsp; 🔥 Ferro elétrico</p></section></main><script>const c=document.getElementById("cv"),x=c.getContext("2d");function capa(){x.fillStyle="#bdbdbd";x.fillRect(0,0,c.width,c.height);x.fillStyle="#222";x.font="bold 54px Arial";x.textAlign="center";x.fillText("🍀 RASPE AQUI",350,200)}capa();let ativa=false;c.addEventListener("pointermove",e=>{if(!ativa)return;let r=c.getBoundingClientRect(),px=(e.clientX-r.left)*c.width/r.width,py=(e.clientY-r.top)*c.height/r.height;x.globalCompositeOperation="destination-out";x.beginPath();x.arc(px,py,32,0,Math.PI*2);x.fill()});document.getElementById("raspar").onclick=()=>{ativa=true;document.getElementById("res").textContent=Math.random()<.5?"🎉 PARABÉNS! LIQUIDIFICADOR":"🎉 PARABÉNS! FERRO ELÉTRICO"};</script></body></html>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="raspadinha.css">
+<title>Raspadinha da Amizade</title>
+</head>
+<body>
+<main class="raspadinha-container">
+
+<section class="hero">
+  <div class="clover">🍀</div>
+  <h1>RASPADINHA<br><span style="color:#7cff00">DA AMIZADE</span></h1>
+  <p>Uma pequena surpresa pode estar esperando por você.</p>
+</section>
+
+<section class="glass raspadinha-card">
+  <div class="raspadinha-titulo">🍀 RASPADINHA DA AMIZADE</div>
+  <p class="raspadinha-subtitulo">Em prol do canil 🐾</p>
+
+  <div class="raspadinha-area">
+    <canvas id="canvasRaspadinha"></canvas>
+    <div id="mensagemPremio" class="mensagem-premio"></div>
+  </div>
+
+  <h2 id="premioResultado">RASPE AQUI</h2>
+  <div class="controles-raspadinha">
+    <button class="btn" id="iniciarRaspagem" type="button">🍀 RASPAR AGORA</button>
+    <button class="btn" id="voltarInicio" type="button">← VOLTAR</button>
+  </div>
+</section>
+
+<!-- =====================================================
+     CARTÃO CONFIRMAR PARTICIPAÇÃO
+====================================================== -->
+<section class="glass confirmacao-card" id="confirmacaoParticipacao">
+  <div class="confirmacao-cabecalho">
+    <div class="confirmacao-icone">🧾</div>
+    <div>
+      <h2>CONFIRMAR PARTICIPAÇÃO</h2>
+      <p>Confira os dados da sua compra e informe seus dados.</p>
+    </div>
+  </div>
+
+  <div class="confirmacao-dados">
+    <div class="dado-box">
+      <span class="dado-icone">🎟️</span>
+      <div><small>Número comprado</small><strong id="confirmacaoNumeros">---</strong></div>
+    </div>
+
+    <div class="dado-box">
+      <span class="dado-icone">💰</span>
+      <div><small>Valor</small><strong id="confirmacaoValor">---</strong></div>
+    </div>
+
+    <div class="dado-box">
+      <span class="dado-icone">📅</span>
+      <div><small>Data da compra</small><strong id="confirmacaoData">---</strong></div>
+    </div>
+
+    <div class="dado-box">
+      <span class="dado-icone">🕐</span>
+      <div><small>Hora da compra</small><strong id="confirmacaoHora">---</strong></div>
+    </div>
+  </div>
+
+  <button class="acao-confirmacao acao-limpar" id="limparNumeros" type="button">
+    🗑️ LIMPAR E ESCOLHER OUTROS NÚMEROS
+  </button>
+
+  <div class="pix-box">
+    <h3>💚 Pagamento via PIX</h3>
+    <p>Utilize a chave PIX abaixo para realizar o pagamento.</p>
+
+    <div class="pix-linha">
+      <div class="pix-chave"><span>PIX</span><strong id="pixChave">---</strong></div>
+      <button class="acao-confirmacao acao-copiar" id="copiarPix" type="button">📋 COPIAR PIX</button>
+    </div>
+
+    <button class="acao-confirmacao acao-comprovante" id="enviarComprovante" type="button">
+      📎 ENVIAR COMPROVANTE
+    </button>
+    <p id="mensagemPix" class="mensagem-pix" aria-live="polite"></p>
+  </div>
+
+  <div class="boa-sorte">🍀 <strong>Boa Sorte!</strong><span>Juntos fazemos a diferença! 💚</span></div>
+</section>
+
+<section class="glass premios-card">
+  <h2>🎁 Prêmios</h2>
+  <p>🍹 Liquidificador &nbsp; OU &nbsp; 🔥 Ferro elétrico</p>
+</section>
+
+</main>
+<div id="confetes"></div>
+<script type="module" src="raspadinha.js"></script>
+</body>
+</html>
